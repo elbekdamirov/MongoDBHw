@@ -1,5 +1,5 @@
-const orderModel = require("../models/order.model");
-const currencyModel = require("../models/currency_type.model");
+const adminModel = require("../models/admin.model");
+const operationModel = require("../models/operation.model");
 
 async function findAll(req, res) {
   let { limit, offset } = req.query;
@@ -7,12 +7,12 @@ async function findAll(req, res) {
     limit = limit ? limit : 10;
     offset = offset ? offset : 1;
 
-    let currencies = await currencyModel
-      .find()
+    let admins = await adminModel
+      .find({})
       .limit(limit)
       .skip((offset - 1) * limit);
 
-    res.status(200).send({ data: currencies });
+    res.status(200).send({ data: admins });
   } catch (error) {
     console.log(error.message);
   }
@@ -21,9 +21,9 @@ async function findAll(req, res) {
 async function findOne(req, res) {
   let { id } = req.params;
   try {
-    let currency = await currencyModel.findById(id);
+    let admin = await adminModel.findById(id);
 
-    res.status(200).send({ data: currency });
+    res.status(200).send({ data: admin });
   } catch (error) {
     console.log(error.message);
   }
@@ -32,14 +32,14 @@ async function findOne(req, res) {
 async function create(req, res) {
   let data = req.body;
   try {
-    let createCurrency = await currencyModel.create(data);
-    let order = await orderModel.findById(data.order_id);
+    let admin = await adminModel.create(data);
+    let operation = await operationModel.findById(data.operation_id);
 
-    order.currency_type_id.addToSet(createCurrency._id);
+    operation.admin_id.addToSet(admin._id);
 
     await save();
 
-    res.status(201).send({ data: createCurrency });
+    res.status(201).send({ data: admin });
   } catch (error) {
     console.log(error.message);
   }
@@ -49,9 +49,9 @@ async function update(req, res) {
   let { id } = req.params;
   let data = req.body;
   try {
-    let updateCurrency = await currencyModel.findByIdAndUpdate(id, data);
+    let admin = await adminModel.findByIdAndUpdate(id, data);
 
-    res.status(200).send({ data: updateCurrency });
+    res.status(200).send({ data: admin });
   } catch (error) {
     console.log(error.message);
   }
@@ -60,9 +60,9 @@ async function update(req, res) {
 async function remove(req, res) {
   let { id } = req.params;
   try {
-    await currencyModel.findByIdAndDelete(id);
+    await adminModel.findByIdAndDelete(id);
 
-    res.status(201).send({ message: "Currency deleted" });
+    res.status(201).send({ message: "Admin deleted" });
   } catch (error) {
     console.log(error.message);
   }
